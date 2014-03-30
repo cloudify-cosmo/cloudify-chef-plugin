@@ -591,6 +591,7 @@ def _context_to_struct(ctx):
         'node_id': ctx.node_id,
         'runtime_properties': ctx.runtime_properties,
         'capabilities': {},
+        'properties': ctx.properties,
     }
     if hasattr(ctx, 'capabilities'):
         ret['capabilities'] = ctx.capabilities.get_all()
