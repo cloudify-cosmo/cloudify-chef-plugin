@@ -28,7 +28,6 @@ from fcntl import flock, LOCK_EX, LOCK_UN, LOCK_NB
 
 import copy
 import re
-import requests
 import os
 import stat
 import urllib
@@ -37,6 +36,8 @@ import tempfile
 import time
 import subprocess
 import json
+
+import requests
 
 CHEF_INSTALLER_URL = "https://www.opscode.com/chef/install.sh"
 SOLO_COOKBOOKS_FILE = "cookbooks.tar.gz"
