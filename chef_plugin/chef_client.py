@@ -590,11 +590,15 @@ def _context_to_struct(ctx):
     ret = {
         'node_id': ctx.node_id,
         'runtime_properties': ctx.runtime_properties,
-        'capabilities': {},
         'properties': ctx.properties,
-        'blueprint_id': ctx.blueprint_id,
-        'deployment_id': ctx.deployment_id,
+        'blueprint_id': '',
+        'deployment_id': '',
+        'capabilities': {},
     }
+    if hasattr(ctx, 'blueprint_id'):
+        ret['blueprint_id'] = ctx.blueprint_id
+    if hasattr(ctx, 'deployment_id'):
+        ret['deployment_id'] = ctx.deployment_id
     if hasattr(ctx, 'capabilities'):
         ret['capabilities'] = ctx.capabilities.get_all()
     return ret
