@@ -1,2 +1,2 @@
-cloudify-chef-plugin
-====================
+cosmo-plugin-chef-client-common
+===============================
