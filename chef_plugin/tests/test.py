@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#******************************************************************************
+# *****************************************************************************
 # Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,7 @@
 #  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
-#******************************************************************************
+# *****************************************************************************
 
 import itertools
 import os
@@ -181,10 +181,10 @@ how = (
      False,  False,  _confirm_default_val),
     ('related_chef_attribute',    True,   True,
      False,  False,  _confirm_default_val),
-    #('related_runtime_property',False,False,True,False,_confirm_no_attr),
-    #('related_chef_attribute',False,False,True,False,_confirm_no_attr),
-    #('related_runtime_property',True,False,True,False,_confirm_default_val),
-    #('related_chef_attribute',True,False,True,False,_confirm_default_val),
+    # ('related_runtime_property',False,False,True,False,_confirm_no_attr),
+    # ('related_chef_attribute',False,False,True,False,_confirm_no_attr),
+    # ('related_runtime_property',True,False,True,False,_confirm_default_val),
+    # ('related_chef_attribute',True,False,True,False,_confirm_default_val),
     ('related_runtime_property',  False,
      True,   True,   False,  _confirm_prop_val),
     ('related_chef_attribute',    False,  True,   True,   False,  KeyError),
@@ -192,10 +192,10 @@ how = (
      True,   False,  _confirm_prop_val),
     ('related_chef_attribute',    True,   True,
      True,   False,  _confirm_default_val),
-    #('related_runtime_property',False,False,False,True,_confirm_no_attr),
-    #('related_chef_attribute',False,False,False,True,_confirm_no_attr),
-    #('related_runtime_property',True,False,False,True,_confirm_default_val),
-    #('related_chef_attribute',True,False,False,True,_confirm_default_val),
+    # ('related_runtime_property',False,False,False,True,_confirm_no_attr),
+    # ('related_chef_attribute',False,False,False,True,_confirm_no_attr),
+    # ('related_runtime_property',True,False,False,True,_confirm_default_val),
+    # ('related_chef_attribute',True,False,False,True,_confirm_default_val),
     ('related_runtime_property',  False,  True,   False,  True,   KeyError),
     ('related_chef_attribute',    False,  True,
      False,  True,   _confirm_chef_attr_val),
@@ -203,10 +203,10 @@ how = (
      False,  True,   _confirm_default_val),
     ('related_chef_attribute',    True,   True,
      False,  True,   _confirm_chef_attr_val),
-    #('related_runtime_property',False,False,True,True,_confirm_no_attr),
-    #('related_chef_attribute',False,False,True,True,_confirm_no_attr),
-    #('related_runtime_property',True,False,True,True,_confirm_default_val),
-    #('related_chef_attribute',True,False,True,True,_confirm_default_val),
+    # ('related_runtime_property',False,False,True,True,_confirm_no_attr),
+    # ('related_chef_attribute',False,False,True,True,_confirm_no_attr),
+    # ('related_runtime_property',True,False,True,True,_confirm_default_val),
+    # ('related_chef_attribute',True,False,True,True,_confirm_default_val),
     ('related_runtime_property',  False,
      True,   True,   True,   _confirm_prop_val),
     ('related_chef_attribute',    False,  True,

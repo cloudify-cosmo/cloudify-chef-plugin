@@ -1,4 +1,4 @@
-#******************************************************************************
+# *****************************************************************************
 # Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +12,7 @@
 #  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
-#******************************************************************************
+# *****************************************************************************
 
 """
 This module provides functions for installing, configuring and running
@@ -204,7 +204,7 @@ class ChefManager(object):
                 os.chmod(chef_install_script.name, stat.S_IRWXU)
                 self._sudo(chef_install_script.name, "-v", chef_version)
                 os.remove(chef_install_script.name)
-                          # on failure, leave for debugging
+                # on failure, leave for debugging
             except Exception as exc:
                 raise ChefError("Chef install failed on:\n%s" % exc)
 
@@ -293,7 +293,7 @@ class ChefManager(object):
         try:
             self._sudo(*cmd)
             os.remove(self.attribute_file.name)
-                      # on failure, leave for debugging
+            # on failure, leave for debugging
         except SudoError as exc:
             raise ChefError("The chef run failed\n"
                             "runlist: {0}\nattributes: {1}\nexception: \n{2}".
