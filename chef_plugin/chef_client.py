@@ -698,6 +698,6 @@ def run_chef(ctx, runlist):
         chef_output_attributes = json.load(f)
 
     del chef_output_attributes['cloudify']['runtime_properties']
-    ctx['chef_attributes'] = chef_output_attributes
+    ctx.runtime_properties['chef_attributes'] = chef_output_attributes
 
     os.remove(attrs_tmp_file.name)
