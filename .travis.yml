@@ -4,13 +4,11 @@ python:
 
 
 install:
-
-    # command to install dependencies
-    - python setup.py install
+    - git clone https://github.com/cloudify-cosmo/cloudify-plugins-common --depth=1
+    - cd cloudify-plugins-common; pip install . -r requirements.txt; cd ..
+    - pip install .
     - sudo pip install flake8
 
 script:
-
-    # command to run tests
     - flake8 .
     - nosetests chef_plugin/tests --nologcapture --nocapture
