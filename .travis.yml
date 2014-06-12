@@ -10,5 +10,5 @@ install:
     - sudo pip install flake8
 
 script:
-    - flake8 .
+    - flake8 . --exclude docs
     - nosetests chef_plugin/tests --nologcapture --nocapture
