@@ -17,11 +17,6 @@
 __author__ = 'dank'
 
 import setuptools
-from pip.req import parse_requirements
-
-install_requires = [
-    str(ir.req) for ir in parse_requirements('requirements.txt')]
-
 
 setuptools.setup(
     zip_safe=False,
@@ -32,7 +27,10 @@ setuptools.setup(
     packages=['chef_plugin'],
     license='LICENSE',
     description='Cloudify Chef plugin',
-    install_requires=install_requires,
+    install_requires=[
+        'cloudify-plugins-common==3.0',
+        'requests',
+    ],
     package_data={
         'chef_plugin': ['chef/handler/cloudify_attributes_to_json_file.rb']
     },
