@@ -15,3 +15,12 @@
 # *****************************************************************************
 
 __author__ = 'yoni@fewbytes.com'
+
+
+import json
+import pkgutil
+
+
+def get_version():
+    data = pkgutil.get_data('cosmo_cli', 'VERSION')
+    return json.loads(data)['version']

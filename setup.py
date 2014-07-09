@@ -18,10 +18,13 @@ __author__ = 'dank'
 
 import setuptools
 
+from chef_plugin import get_version
+
+
 setuptools.setup(
     zip_safe=False,
     name='cloudify-chef-plugin',
-    version='1.0',
+    version=get_version(),
     author='ilya',
     author_email='ilya.sher@coding-knight.com',
     packages=['chef_plugin'],
@@ -32,6 +35,9 @@ setuptools.setup(
         'requests',
     ],
     package_data={
-        'chef_plugin': ['chef/handler/cloudify_attributes_to_json_file.rb']
+        'chef_plugin': [
+            'chef/handler/cloudify_attributes_to_json_file.rb',
+            'VERSION'
+        ]
     },
 )
