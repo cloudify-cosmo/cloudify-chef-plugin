@@ -18,28 +18,33 @@ __author__ = 'dank'
 
 import setuptools
 
+<<<<<<< HEAD
 PLUGIN_COMMONS_VERSION = '3.0'
 PLUGIN_COMMONS_BRANCH = '3.0'
 PLUGIN_COMMONS = 'https://github.com/cloudify-cosmo/cloudify-plugins-common' \
     '/tarball/{0}'.format(PLUGIN_COMMONS_BRANCH)
+=======
+from chef_plugin import get_version
+
+>>>>>>> 1.0
 
 setuptools.setup(
     zip_safe=False,
     name='cloudify-chef-plugin',
-    version='1.0',
+    version=get_version(),
     author='ilya',
     author_email='ilya.sher@coding-knight.com',
     packages=['chef_plugin'],
     license='LICENSE',
     description='Cloudify Chef plugin',
     install_requires=[
-        "cloudify-plugins-common",
-        "requests",
+        'cloudify-plugins-common>=3.0',
+        'requests',
     ],
     package_data={
-        'chef_plugin': ['chef/handler/cloudify_attributes_to_json_file.rb']
+        'chef_plugin': [
+            'chef/handler/cloudify_attributes_to_json_file.rb',
+            'VERSION'
+        ]
     },
-    dependency_links=[
-        "{0}#egg=cloudify-plugins-common-{1}".format(PLUGIN_COMMONS,
-                                                     PLUGIN_COMMONS_VERSION)]
 )
