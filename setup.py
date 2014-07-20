@@ -18,15 +18,8 @@ __author__ = 'dank'
 
 import setuptools
 
-<<<<<<< HEAD
-PLUGIN_COMMONS_VERSION = '3.0'
-PLUGIN_COMMONS_BRANCH = '3.0'
-PLUGIN_COMMONS = 'https://github.com/cloudify-cosmo/cloudify-plugins-common' \
-    '/tarball/{0}'.format(PLUGIN_COMMONS_BRANCH)
-=======
 from chef_plugin import get_version
 
->>>>>>> 1.0
 
 setuptools.setup(
     zip_safe=False,
