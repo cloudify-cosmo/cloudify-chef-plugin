@@ -36,9 +36,6 @@
 # WARNING:
 # Chef uninstall is not supported at this time.
 
-imports:
-    - http://www.getcloudify.org/spec/cloudify/{{ cloudify_version }}/types.yaml
-
 plugins:
     chef_plugin:
         derived_from: cloudify.plugins.agent_plugin
