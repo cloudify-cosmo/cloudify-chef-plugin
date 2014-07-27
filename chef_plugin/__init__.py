@@ -16,11 +16,3 @@
 
 __author__ = 'yoni@fewbytes.com'
 
-
-import json
-import pkgutil
-
-
-def get_version():
-    data = pkgutil.get_data('chef_plugin', 'VERSION')
-    return json.loads(data)['version']
