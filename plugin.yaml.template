@@ -34,7 +34,7 @@
 # Chef uninstall is not supported at this time.
 
 plugins:
-    chef_plugin:
+    chef-plugin:
         derived_from: cloudify.plugins.agent_plugin
         properties:
             url: https://github.com/cloudify-cosmo/cloudify-chef-plugin/archive/{{ plugin_branch }}.zip
@@ -177,23 +177,23 @@ node_types:
             # to the operation being performed. The operation is taken
             # from the passed context (CloudifyContext.operation)
             cloudify.interfaces.lifecycle:
-                - create:    chef_plugin.operations.operation
-                - configure: chef_plugin.operations.operation
-                - start:     chef_plugin.operations.operation
-                - stop:      chef_plugin.operations.operation
-                - delete:    chef_plugin.operations.operation
+                - create:    chef-plugin.chef_plugin.operations.operation
+                - configure: chef-plugin.chef_plugin.operations.operation
+                - start:     chef-plugin.chef_plugin.operations.operation
+                - stop:      chef-plugin.chef_plugin.operations.operation
+                - delete:    chef-plugin.chef_plugin.operations.operation
 
     # A web server configured with chef
     # see docs for cloudify.types.chef.middleware_server
-    cloudify.types.chef.web_server:
+    cloudify.types.chef.web_server:\
         derived_from: cloudify.types.web_server
         interfaces:
             cloudify.interfaces.lifecycle:
-                - create:    chef_plugin.operations.operation
-                - configure: chef_plugin.operations.operation
-                - start:     chef_plugin.operations.operation
-                - stop:      chef_plugin.operations.operation
-                - delete:    chef_plugin.operations.operation
+                - create:    chef-plugin.chef_plugin.operations.operation
+                - configure: chef-plugin.chef_plugin.operations.operation
+                - start:     chef-plugin.chef_plugin.operations.operation
+                - stop:      chef-plugin.chef_plugin.operations.operation
+                - delete:    chef-plugin.chef_plugin.operations.operation
         properties:
             chef_config: {}
 
@@ -203,11 +203,11 @@ node_types:
         derived_from: cloudify.types.app_server
         interfaces:
             cloudify.interfaces.lifecycle:
-                - create:    chef_plugin.operations.operation
-                - configure: chef_plugin.operations.operation
-                - start:     chef_plugin.operations.operation
-                - stop:      chef_plugin.operations.operation
-                - delete:    chef_plugin.operations.operation
+                - create:    chef-plugin.chef_plugin.operations.operation
+                - configure: chef-plugin.chef_plugin.operations.operation
+                - start:     chef-plugin.chef_plugin.operations.operation
+                - stop:      chef-plugin.chef_plugin.operations.operation
+                - delete:    chef-plugin.chef_plugin.operations.operation
         properties:
             chef_config: {}
 
@@ -217,11 +217,11 @@ node_types:
         derived_from: cloudify.types.db_server
         interfaces:
             cloudify.interfaces.lifecycle:
-                - create:    chef_plugin.operations.operation
-                - configure: chef_plugin.operations.operation
-                - start:     chef_plugin.operations.operation
-                - stop:      chef_plugin.operations.operation
-                - delete:    chef_plugin.operations.operation
+                - create:    chef-plugin.chef_plugin.operations.operation
+                - configure: chef-plugin.chef_plugin.operations.operation
+                - start:     chef-plugin.chef_plugin.operations.operation
+                - stop:      chef-plugin.chef_plugin.operations.operation
+                - delete:    chef-plugin.chef_plugin.operations.operation
         properties:
             chef_config: {}
 
@@ -231,11 +231,11 @@ node_types:
         derived_from: cloudify.types.message_bus_server
         interfaces:
             cloudify.interfaces.lifecycle:
-                - create:    chef_plugin.operations.operation
-                - configure: chef_plugin.operations.operation
-                - start:     chef_plugin.operations.operation
-                - stop:      chef_plugin.operations.operation
-                - delete:    chef_plugin.operations.operation
+                - create:    chef-plugin.chef_plugin.operations.operation
+                - configure: chef-plugin.chef_plugin.operations.operation
+                - start:     chef-plugin.chef_plugin.operations.operation
+                - stop:      chef-plugin.chef_plugin.operations.operation
+                - delete:    chef-plugin.chef_plugin.operations.operation
         properties:
             chef_config: {}
 
@@ -245,11 +245,11 @@ node_types:
         derived_from: cloudify.types.app_module
         interfaces:
             cloudify.interfaces.lifecycle:
-                - create:    chef_plugin.operations.operation
-                - configure: chef_plugin.operations.operation
-                - start:     chef_plugin.operations.operation
-                - stop:      chef_plugin.operations.operation
-                - delete:    chef_plugin.operations.operation
+                - create:    chef-plugin.chef_plugin.operations.operation
+                - configure: chef-plugin.chef_plugin.operations.operation
+                - start:     chef-plugin.chef_plugin.operations.operation
+                - stop:      chef-plugin.chef_plugin.operations.operation
+                - delete:    chef-plugin.chef_plugin.operations.operation
         properties:
             chef_config: {}
 
@@ -259,27 +259,27 @@ relationships:
         source_interfaces:
             # The comment under types.interfaces applies here too
             cloudify.interfaces.relationship_lifecycle:
-                - preconfigure:  chef_plugin.operations.operation
-                - postconfigure: chef_plugin.operations.operation
-                - establish:     chef_plugin.operations.operation
-                - unlink:        chef_plugin.operations.operation
+                - preconfigure:  chef-plugin.chef_plugin.operations.operation
+                - postconfigure: chef-plugin.chef_plugin.operations.operation
+                - establish:     chef-plugin.chef_plugin.operations.operation
+                - unlink:        chef-plugin.chef_plugin.operations.operation
 
     cloudify.chef.connected_to:
         derived_from: cloudify.relationships.connected_to
         source_interfaces:
             # The comment under types.interfaces applies here too
             cloudify.interfaces.relationship_lifecycle:
-                - preconfigure:  chef_plugin.operations.operation
-                - postconfigure: chef_plugin.operations.operation
-                - establish:     chef_plugin.operations.operation
-                - unlink:        chef_plugin.operations.operation
+                - preconfigure:  chef-plugin.chef_plugin.operations.operation
+                - postconfigure: chef-plugin.chef_plugin.operations.operation
+                - establish:     chef-plugin.chef_plugin.operations.operation
+                - unlink:        chef-plugin.chef_plugin.operations.operation
 
     cloudify.chef.contained_in:
         derived_from: cloudify.relationships.connected_to
         source_interfaces:
             # The comment under types.interfaces applies here too
             cloudify.interfaces.relationship_lifecycle:
-                - preconfigure:  chef_plugin.operations.operation
-                - postconfigure: chef_plugin.operations.operation
-                - establish:     chef_plugin.operations.operation
-                - unlink:        chef_plugin.operations.operation
+                - preconfigure:  chef-plugin.chef_plugin.operations.operation
+                - postconfigure: chef-plugin.chef_plugin.operations.operation
+                - establish:     chef-plugin.chef_plugin.operations.operation
+                - unlink:        chef-plugin.chef_plugin.operations.operation
