@@ -35,9 +35,8 @@
 
 plugins:
     chef:
-        derived_from: cloudify.plugins.agent_plugin
-        properties:
-            url: https://github.com/cloudify-cosmo/cloudify-chef-plugin/archive/{{ plugin_branch }}.zip
+        executor: host_agent
+        source: https://github.com/cloudify-cosmo/cloudify-chef-plugin/archive/{{ plugin_branch }}.zip
 
 node_types:
     cloudify.types.chef.middleware_server:
