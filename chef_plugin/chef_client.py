@@ -583,7 +583,8 @@ def get_manager(ctx):
     raise ChefError("Failed to find appropriate Chef manager "
                     "for the specified arguments ({0}). "
                     "Possible arguments sets are: {1}"
-                    .format(ctx.node.properties['chef_config'], arguments_sets))
+                    .format(ctx.node.properties['chef_config'],
+                            arguments_sets))
 
 
 def _context_to_struct(ctx):
