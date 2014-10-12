@@ -587,15 +587,26 @@ def get_manager(ctx):
                             arguments_sets))
 
 
-def _context_to_struct(ctx):
-    ret = {
-        'node_id': ctx.instance.id,
-        'runtime_properties': ctx.instance.runtime_properties,
-        'properties': ctx.node.properties,
-        'blueprint_id': '',
-        'deployment_id': '',
-        'capabilities': {},
-    }
+def _context_to_struct(ctx, related=False):
+    # related is temporary until api changes to source/target
+    if related:
+        ret = {
+            'node_id': ctx.node_id,
+            'runtime_properties': ctx.runtime_properties,
+            'properties': ctx.properties,
+            'blueprint_id': '',
+            'deployment_id': '',
+            'capabilities': {},
+        }
+    else:
+        ret = {
+            'node_id': ctx.instance.id,
+            'runtime_properties': ctx.instance.runtime_properties,
+            'properties': ctx.node.properties,
+            'blueprint_id': '',
+            'deployment_id': '',
+            'capabilities': {},
+        }
     if hasattr(ctx, 'blueprint_id'):
         ret['blueprint_id'] = ctx.blueprint.id
     if hasattr(ctx, 'deployment_id'):
@@ -666,7 +677,7 @@ def _prepare_chef_attributes(ctx):
 
     if ctx.related:
         chef_attributes['cloudify'][
-            'related'] = _context_to_struct(ctx.related)
+            'related'] = _context_to_struct(ctx.related, related=True)
 
     chef_attributes = _process_rel_runtime_props(ctx, chef_attributes)
 

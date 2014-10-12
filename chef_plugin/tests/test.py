@@ -56,6 +56,14 @@ def _make_context(installation_type='solo', operation=None,
     return ctx
 
 
+class MockRelatedNode(object):
+
+    def __init__(self, node_id=None, properties=None, runtime_properties=None):
+        self.node_id = node_id
+        self.properties = properties
+        self.runtime_properties = runtime_properties
+
+
 class ChefPluginTest(object):
 
     def _make_context(self, operation=None, merge_chef_attributes=None):
@@ -87,7 +95,7 @@ class ChefPluginAttrubutesPassingTestBase(object):
                 runtime_properties['chef_attributes'] = {
                     'prop1': 'chef_attr_val'
                 }
-            related = MockCloudifyContext(
+            related = MockRelatedNode(
                 node_id='clodufiy_db_node_id_' + str(node_id.next()),
                 runtime_properties=runtime_properties,
             )
@@ -105,7 +113,7 @@ class ChefPluginAttrubutesPassingTestBase(object):
             return chef_client._prepare_chef_attributes(ctx)
 
     def test_deep(self):
-        related = MockCloudifyContext(
+        related = MockRelatedNode(
             node_id='clodufiy_db_node_id_' + str(node_id.next()),
             runtime_properties={
                 'chef_attributes': {
