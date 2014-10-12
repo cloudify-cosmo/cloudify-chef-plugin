@@ -105,9 +105,9 @@ class RetryingLock(object):
                                 "node_name {2}\n"
                                 "node_id {3}\n".format(
                                     os.getpid(),
-                                    self.ctx.deployment_id,
-                                    self.ctx.node_name,
-                                    self.ctx.node_id))
+                                    self.ctx.deployment.id,
+                                    self.ctx.node.name,
+                                    self.ctx.instance.id))
                 self.file.flush()
                 return
         raise RuntimeError("Failed to lock the file '{0}'.".format(self.path))
@@ -133,14 +133,14 @@ class ChefManager(object):
     def can_handle(cls, ctx):
         # All of the required args exist and are not None:
         return all([
-                   ctx.properties['chef_config'].get(arg) is not None
+                   ctx.node.properties['chef_config'].get(arg) is not None
                    for arg in cls.REQUIRED_ARGS
                    ])
 
     @classmethod
     def assert_args(cls, ctx):
         missing_fields = (cls.REQUIRED_ARGS).union(
-            {'version'}).difference(ctx.properties['chef_config'].keys())
+            {'version'}).difference(ctx.node.properties['chef_config'].keys())
         if missing_fields:
             raise ChefError(
                 "The following required field(s) "
@@ -160,12 +160,12 @@ class ChefManager(object):
         """ Get Chef root for this YAML node """
         # XXX: probably not fully cross-platform
         return os.path.join(os.sep, 'var', 'chef',
-                            'cloudify-node-' + self.ctx.node_id)
+                            'cloudify-node-' + self.ctx.node.id)
 
     def get_chef_node_name(self):
         """ Get Chef's node_name for this YAML node """
-        node_id = re.sub(r'[^a-zA-Z0-9-]', "-", str(self.ctx.node_id))
-        cc = self.ctx.properties['chef_config']
+        node_id = re.sub(r'[^a-zA-Z0-9-]', "-", str(self.ctx.node.id))
+        cc = self.ctx.node.properties['chef_config']
         return cc['node_name_prefix'] + node_id + cc['node_name_suffix']
 
     def get_path(self, *p):
@@ -175,7 +175,7 @@ class ChefManager(object):
     def install(self):
         """If needed, install chef-client and point it to the server"""
         ctx = self.ctx
-        chef_version = ctx.properties['chef_config']['version']
+        chef_version = ctx.node.properties['chef_config']['version']
 
         with RetryingLock(ctx, *CHEF_INSTALL_LOCK):
 
@@ -209,7 +209,7 @@ class ChefManager(object):
                 raise ChefError("Chef install failed on:\n%s" % exc)
 
             ctx.logger.info('Setting up Chef [chef_server=\n%s]',
-                            ctx.properties['chef_config']
+                            ctx.node.properties['chef_config']
                             .get('chef_server_url'))
 
     def install_files(self):
@@ -281,7 +281,7 @@ class ChefManager(object):
         self._prepare_for_run(runlist)
 
         t = 'cloudify_chef_attrs_in.{0}.{1}.{2}.'.format(
-            ctx.node_name, ctx.node_id, os.getpid())
+            ctx.node.name, ctx.instance.id, os.getpid())
         self.attribute_file = tempfile.NamedTemporaryFile(prefix=t,
                                                           suffix=".json",
                                                           delete=False)
@@ -387,7 +387,7 @@ class ChefClientManager(ChefManager):
         super(ChefClientManager, self).__init__(*args, **kwargs)
         ctx = self.ctx
         for k in 'node_name_prefix', 'node_name_suffix':
-            if k not in ctx.properties['chef_config']:
+            if k not in ctx.node.properties['chef_config']:
                 raise RuntimeError("Missing chef_config.{0} parameter".format(
                                    k))
 
@@ -409,10 +409,10 @@ class ChefClientManager(ChefManager):
         ctx = self.ctx
         chef_data_root = self.get_chef_data_root()
 
-        if ctx.properties['chef_config'].get('validation_key'):
+        if ctx.node.properties['chef_config'].get('validation_key'):
             self._sudo_write_file(
                 self.get_path('etc', 'validation.pem'),
-                ctx.properties['chef_config']['validation_key'])
+                ctx.node.properties['chef_config']['validation_key'])
 
         node_name = self.get_chef_node_name()
 
@@ -431,7 +431,7 @@ class ChefClientManager(ChefManager):
             'Chef::Log::Formatter.show_time = true\n'.format(
                 node_name=node_name,
                 chef_data_root=chef_data_root,
-                **ctx.properties['chef_config']))
+                **ctx.node.properties['chef_config']))
 
 
 def is_resource_url(url):
@@ -511,7 +511,7 @@ class ChefSoloManager(ChefManager):
 
     def _prepare_for_run(self, runlist):
         ctx = self.ctx
-        cc = ctx.properties['chef_config']
+        cc = ctx.node.properties['chef_config']
         file_name = self.get_path(SOLO_COOKBOOKS_FILE)
         for dl in 'environments', 'data_bags', 'roles':
             self._url_to_dir(cc.get(dl), self.get_path(dl))
@@ -533,14 +533,14 @@ class ChefSoloManager(ChefManager):
         cookbooks_file_path = self.get_path(SOLO_COOKBOOKS_FILE)
         cmd = ["chef-solo"]
 
-        if (ctx.properties['chef_config'].get('environment', '_default')
+        if (ctx.node.properties['chef_config'].get('environment', '_default')
                 != '_default'):
             v = self.get_version()
             if map(int, v.split('.')) < ENVS_MIN_VER:
                 raise ChefError("Chef solo environments are supported "
                                 "starting at {0} but you are using {1}".
                                 format(ENVS_MIN_VER_STR, v))
-            cmd += ["-E", ctx.properties['chef_config']['environment']]
+            cmd += ["-E", ctx.node.properties['chef_config']['environment']]
         cmd += [
             "-c", self.get_path('etc', 'solo.rb'),
             "-o", runlist,
@@ -566,7 +566,7 @@ class ChefSoloManager(ChefManager):
             'pid_file               "{chef_data_root}/solo.pid"\n'
             'Chef::Log::Formatter.show_time = true\n'.format(
                 chef_data_root=self.get_chef_data_root(),
-                **ctx.properties['chef_config']))
+                **ctx.node.properties['chef_config']))
 
 
 def get_manager(ctx):
@@ -583,22 +583,22 @@ def get_manager(ctx):
     raise ChefError("Failed to find appropriate Chef manager "
                     "for the specified arguments ({0}). "
                     "Possible arguments sets are: {1}"
-                    .format(ctx.properties['chef_config'], arguments_sets))
+                    .format(ctx.node.properties['chef_config'], arguments_sets))
 
 
 def _context_to_struct(ctx):
     ret = {
-        'node_id': ctx.node_id,
-        'runtime_properties': ctx.runtime_properties,
-        'properties': ctx.properties,
+        'node_id': ctx.instance.id,
+        'runtime_properties': ctx.instance.runtime_properties,
+        'properties': ctx.node.properties,
         'blueprint_id': '',
         'deployment_id': '',
         'capabilities': {},
     }
     if hasattr(ctx, 'blueprint_id'):
-        ret['blueprint_id'] = ctx.blueprint_id
+        ret['blueprint_id'] = ctx.blueprint.id
     if hasattr(ctx, 'deployment_id'):
-        ret['deployment_id'] = ctx.deployment_id
+        ret['deployment_id'] = ctx.deployment.id
     if hasattr(ctx, 'capabilities'):
         ret['capabilities'] = ctx.capabilities.get_all()
     return ret
@@ -646,7 +646,7 @@ def _process_rel_runtime_props(ctx, data):
 
 def _prepare_chef_attributes(ctx):
 
-    chef_attributes = ctx.properties['chef_config'].get('attributes', {})
+    chef_attributes = ctx.node.properties['chef_config'].get('attributes', {})
 
     # If chef_attributes is JSON
     if isinstance(chef_attributes, basestring) and chef_attributes != '':
@@ -674,7 +674,7 @@ def _prepare_chef_attributes(ctx):
 
 def run_chef(ctx, runlist):
     """Run given runlist using Chef.
-    ctx.properties.chef_config.chef_attributes can be a dict or a JSON.
+    ctx.node.properties.chef_config.chef_attributes can be a dict or a JSON.
     """
 
     if runlist is None:
@@ -683,7 +683,7 @@ def run_chef(ctx, runlist):
     chef_attributes = _prepare_chef_attributes(ctx)
 
     t = 'cloudify_chef_attrs_out.{0}.{1}.{2}.'.format(
-        ctx.node_name, ctx.node_id, os.getpid())
+        ctx.node.name, ctx.instance.id, os.getpid())
     attrs_tmp_file = tempfile.NamedTemporaryFile(
         prefix=t, suffix='.json', delete=False)
     chef_attributes['cloudify']['attributes_output_file'] = attrs_tmp_file.name
@@ -698,6 +698,6 @@ def run_chef(ctx, runlist):
         chef_output_attributes = json.load(f)
 
     del chef_output_attributes['cloudify']['runtime_properties']
-    ctx.runtime_properties['chef_attributes'] = chef_output_attributes
+    ctx.instance.runtime_properties['chef_attributes'] = chef_output_attributes
 
     os.remove(attrs_tmp_file.name)
