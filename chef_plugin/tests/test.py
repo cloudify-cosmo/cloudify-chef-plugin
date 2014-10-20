@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # *****************************************************************************
 # Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
 #
@@ -22,9 +20,10 @@ import random
 import string
 import tempfile
 import unittest
+import logging
 
-
-from cloudify.mocks import MockCloudifyContext
+from cloudify import context
+from cloudify import mocks
 
 import chef_plugin.chef_client as chef_client
 
@@ -36,7 +35,7 @@ node_id = itertools.count(100)
 
 
 def _make_context(installation_type='solo', operation=None,
-                  merge_chef_attributes=None, related=None):
+                  merge_chef_attributes=None, target=None):
     props = {}
     props.setdefault('attributes', {})
     props['attributes'].setdefault('create_file', {})
@@ -45,14 +44,30 @@ def _make_context(installation_type='solo', operation=None,
     props['attributes']['create_file'].setdefault(
         'file_contents', CHEF_CREATED_FILE_CONTENTS)
     props['attributes'].update(merge_chef_attributes or {})
-    ctx = MockCloudifyContext(
-        node_id='clodufiy_app_node_id_{0}_{1}'.format(
-            node_id.next(), os.getpid()),
-        operation='cloudify.interfaces.lifecycle.' +
-        (operation or 'INVALID'),
-        properties={'chef_config': props},
-        related=related
-    )
+
+    ctx = mocks.MockContext({
+        'blueprint': mocks.MockContext({
+            'id': 'blueprint-id'
+        }),
+        'deployment': mocks.MockContext({
+            'id': 'deployment-id'
+        }),
+        'instance': mocks.MockContext({
+            'id': 'clodufiy_app_node_id_{0}_{1}'.format(
+                node_id.next(), os.getpid()),
+            'runtime_properties': {}
+        }),
+        'node': mocks.MockContext({
+            'name': 'clodufiy_app_node_id',
+            'properties': {'chef_config': props}
+        }),
+        'operation': 'cloudify.interfaces.lifecycle.' +
+                     (operation or 'INVALID'),
+        'target': target,
+        'type': context.RELATIONSHIP_INSTANCE
+        if target else context.NODE_INSTANCE,
+        'logger': logging.getLogger('test')
+    })
     return ctx
 
 
@@ -95,16 +110,21 @@ class ChefPluginAttrubutesPassingTestBase(object):
                 runtime_properties['chef_attributes'] = {
                     'prop1': 'chef_attr_val'
                 }
-            related = MockRelatedNode(
-                node_id='clodufiy_db_node_id_' + str(node_id.next()),
-                runtime_properties=runtime_properties,
-            )
+            target = mocks.MockContext({
+                'node': mocks.MockContext({
+                    'properties': {}
+                }),
+                'instance': mocks.MockContext({
+                    'id': 'clodufiy_db_node_id_' + str(node_id.next()),
+                    'runtime_properties': runtime_properties
+                })
+            })
         else:
-            related = None
+            target = None
         # print("MERGE_CHEF_ATTRIBUTES", merge_chef_attributes)
         ctx = _make_context(
             operation='install', merge_chef_attributes=merge_chef_attributes,
-            related=related)
+            target=target)
         # print("CTX", str(ctx), "RELATED", str(related))
         if expect_exception:
             self.assertRaises(
@@ -113,16 +133,21 @@ class ChefPluginAttrubutesPassingTestBase(object):
             return chef_client._prepare_chef_attributes(ctx)
 
     def test_deep(self):
-        related = MockRelatedNode(
-            node_id='clodufiy_db_node_id_' + str(node_id.next()),
-            runtime_properties={
-                'chef_attributes': {
-                    'a': {
-                        'b': 7
+        target = mocks.MockContext({
+            'node': mocks.MockContext({
+                'properties': {}
+            }),
+            'instance': mocks.MockContext({
+                'id': 'clodufiy_db_node_id_' + str(node_id.next()),
+                'runtime_properties': {
+                    'chef_attributes': {
+                        'a': {
+                            'b': 7
+                        }
                     }
                 }
-            },
-        )
+            })
+        })
         ctx = _make_context(operation='install', merge_chef_attributes={
             'attr2': {
                 'attr2b': {
@@ -130,7 +155,7 @@ class ChefPluginAttrubutesPassingTestBase(object):
                 }
             }
 
-        }, related=related)
+        }, target=target)
         # print("CTX", str(ctx), "RELATED", str(related))
         v = chef_client._prepare_chef_attributes(ctx)
         self.assertIn('attr2', v)

@@ -1,4 +1,4 @@
-# *****************************************************************************
+#########
 # Copyright (c) 2014 GigaSpaces Technologies Ltd. All rights reserved
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +12,6 @@
 #  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
-# *****************************************************************************
 
 """
 This module provides functions for installing, configuring and running
@@ -38,6 +37,9 @@ import subprocess
 import json
 
 import requests
+
+from cloudify import context
+
 
 CHEF_INSTALLER_URL = "https://www.opscode.com/chef/install.sh"
 SOLO_COOKBOOKS_FILE = "cookbooks.tar.gz"
@@ -587,15 +589,14 @@ def get_manager(ctx):
                             arguments_sets))
 
 
-def _context_to_struct(ctx, related=False):
-    # related is temporary until api changes to source/target
-    if related:
+def _context_to_struct(ctx):
+    if ctx.type == context.RELATIONSHIP_INSTANCE:
         ret = {
-            'node_id': ctx.node_id,
-            'runtime_properties': ctx.runtime_properties,
-            'properties': ctx.properties,
-            'blueprint_id': '',
-            'deployment_id': '',
+            'node_id': ctx.target.instance.id,
+            'runtime_properties': ctx.target.instance.runtime_properties,
+            'properties': ctx.target.node.properties,
+            'blueprint_id': ctx.blueprint.id,
+            'deployment_id': ctx.deployment.id,
             'capabilities': {},
         }
     else:
@@ -632,12 +633,12 @@ def _process_rel_runtime_props(ctx, data):
 
         if path:
             # Nothing to fetch. Use default_value if provided.
-            if not ctx.related:
+            if ctx.type != context.RELATIONSHIP_INSTANCE:
                 if 'default_value' in v:
                     ret[k] = v['default_value']
                 continue
 
-            ptr = ctx.related.runtime_properties
+            ptr = ctx.target.instance.runtime_properties
             orig_path = path[:]
             try:
                 while path:
@@ -648,8 +649,11 @@ def _process_rel_runtime_props(ctx, data):
                     ret[k] = v['default_value']
                     continue
                 else:
-                    raise KeyError("Runtime propery {0} not found in related "
-                                   "node {1}".format(orig_path, ctx.related))
+                    raise KeyError(
+                        "Runtime propery {0} not found in target "
+                        "node {1}".format(
+                            orig_path,
+                            ctx.target.instance.runtime_properties))
             ret[k] = ptr
         else:
             ret[k] = _process_rel_runtime_props(ctx, v)
@@ -675,9 +679,9 @@ def _prepare_chef_attributes(ctx):
     chef_attributes = chef_attributes.copy()
     chef_attributes['cloudify'] = _context_to_struct(ctx)
 
-    if ctx.related:
+    if ctx.type == context.RELATIONSHIP_INSTANCE:
         chef_attributes['cloudify'][
-            'related'] = _context_to_struct(ctx.related, related=True)
+            'related'] = _context_to_struct(ctx)
 
     chef_attributes = _process_rel_runtime_props(ctx, chef_attributes)
 
