@@ -13,6 +13,7 @@
 #    * See the License for the specific language governing permissions and
 #    * limitations under the License.
 
+from cloudify import context
 from cloudify.decorators import operation as _operation
 
 from chef_plugin.chef_client import run_chef
@@ -33,16 +34,20 @@ def _extract_op(ctx):
 
 @_operation
 def operation(ctx, **kwargs):
+    if ctx.type == context.NODE_INSTANCE:
+        properties = ctx.node.properties
+    else:
+        properties = ctx.source.node.properties
 
-    if 'runlist' in ctx.node.properties['chef_config']:
+    if 'runlist' in properties['chef_config']:
         ctx.logger.info("Using explicitly provided Chef runlist")
-        runlist = ctx.node.properties['chef_config']['runlist']
+        runlist = properties['chef_config']['runlist']
     else:
         op = _extract_op(ctx)
-        if op not in ctx.node.properties['chef_config']['runlists']:
+        if op not in properties['chef_config']['runlists']:
             ctx.logger.warn("No Chef runlist for operation {0}".format(op))
         ctx.logger.info("Using Chef runlist for operation {0}".format(op))
-        runlist = ctx.node.properties['chef_config']['runlists'].get(op)
+        runlist = properties['chef_config']['runlists'].get(op)
 
     if isinstance(runlist, list):
         runlist = ','.join(runlist)
