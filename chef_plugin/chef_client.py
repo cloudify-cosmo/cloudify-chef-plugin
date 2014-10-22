@@ -600,10 +600,16 @@ def _context_to_struct(ctx, target=False):
             'capabilities': {},
         }
     else:
+        if ctx.type == context.NODE_INSTANCE:
+            node = ctx.node
+            instance = ctx.instance
+        else:
+            node = ctx.source.node
+            instance = ctx.source.instance
         ret = {
-            'node_id': ctx.instance.id,
-            'runtime_properties': ctx.instance.runtime_properties,
-            'properties': ctx.node.properties,
+            'node_id': instance.id,
+            'runtime_properties': instance.runtime_properties,
+            'properties': node.properties,
             'blueprint_id': ctx.blueprint.id,
             'deployment_id': ctx.deployment.id,
             'capabilities': {},

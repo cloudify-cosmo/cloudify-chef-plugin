@@ -52,22 +52,33 @@ def _make_context(installation_type='solo', operation=None,
         'deployment': mocks.MockContext({
             'id': 'deployment-id'
         }),
-        'instance': mocks.MockContext({
-            'id': 'clodufiy_app_node_id_{0}_{1}'.format(
-                node_id.next(), os.getpid()),
-            'runtime_properties': {}
-        }),
-        'node': mocks.MockContext({
-            'name': 'clodufiy_app_node_id',
-            'properties': {'chef_config': props}
-        }),
         'operation': 'cloudify.interfaces.lifecycle.' +
                      (operation or 'INVALID'),
-        'target': target,
-        'type': context.RELATIONSHIP_INSTANCE
-        if target else context.NODE_INSTANCE,
         'logger': logging.getLogger('test')
     })
+
+    instance = mocks.MockContext({
+        'id': 'clodufiy_app_node_id_{0}_{1}'.format(
+            node_id.next(), os.getpid()),
+        'runtime_properties': {}
+    })
+
+    node = mocks.MockContext({
+        'name': 'clodufiy_app_node_id',
+        'properties': {'chef_config': props}
+    })
+
+    if target is not None:
+        ctx['source'] = mocks.MockContext({
+            'instance': instance,
+            'node': node
+        })
+        ctx['target'] = target
+        ctx['type'] = context.RELATIONSHIP_INSTANCE
+    else:
+        ctx['instance'] = instance
+        ctx['node'] = node
+        ctx['type'] = context.NODE_INSTANCE
     return ctx
 
 
