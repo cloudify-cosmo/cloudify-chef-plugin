@@ -657,8 +657,12 @@ def _process_rel_runtime_props(ctx, data):
 
 
 def _prepare_chef_attributes(ctx):
+    if ctx.type == context.NODE_INSTANCE:
+        properties = ctx.node.properties
+    else:
+        properties = ctx.source.node.properties
 
-    chef_attributes = ctx.node.properties['chef_config'].get('attributes', {})
+    chef_attributes = properties['chef_config'].get('attributes', {})
 
     # If chef_attributes is JSON
     if isinstance(chef_attributes, basestring) and chef_attributes != '':
