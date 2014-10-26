@@ -582,11 +582,14 @@ def get_manager(ctx):
     arguments_sets = '; '.join(
         ['(for ' + m.NAME + '): ' + ', '.join(
             list(m.REQUIRED_ARGS)) for m in managers])
+    if ctx.type == context.NODE_INSTANCE:
+        chef_config = ctx.node.properties['chef_config']
+    else:
+        chef_config = ctx.source.node.properties['chef_config']
     raise ChefError("Failed to find appropriate Chef manager "
                     "for the specified arguments ({0}). "
                     "Possible arguments sets are: {1}"
-                    .format(ctx.node.properties['chef_config'],
-                            arguments_sets))
+                    .format(chef_config, arguments_sets))
 
 
 def _context_to_struct(ctx, target=False):
@@ -704,8 +707,15 @@ def run_chef(ctx, runlist):
 
     chef_attributes = _prepare_chef_attributes(ctx)
 
+    if ctx.type == context.NODE_INSTANCE:
+        node = ctx.node
+        instance = ctx.instance
+    else:
+        node = ctx.source.node
+        instance = ctx.source.instance
+
     t = 'cloudify_chef_attrs_out.{0}.{1}.{2}.'.format(
-        ctx.node.name, ctx.instance.id, os.getpid())
+        node.name, instance.id, os.getpid())
     attrs_tmp_file = tempfile.NamedTemporaryFile(
         prefix=t, suffix='.json', delete=False)
     chef_attributes['cloudify']['attributes_output_file'] = attrs_tmp_file.name
@@ -720,6 +730,6 @@ def run_chef(ctx, runlist):
         chef_output_attributes = json.load(f)
 
     del chef_output_attributes['cloudify']['runtime_properties']
-    ctx.instance.runtime_properties['chef_attributes'] = chef_output_attributes
+    instance.runtime_properties['chef_attributes'] = chef_output_attributes
 
     os.remove(attrs_tmp_file.name)
