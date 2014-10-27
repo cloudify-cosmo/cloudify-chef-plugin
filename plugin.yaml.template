@@ -39,7 +39,7 @@ plugins:
         source: https://github.com/cloudify-cosmo/cloudify-chef-plugin/archive/{{ plugin_branch }}.zip
 
 node_types:
-    cloudify.types.chef.middleware_server:
+    cloudify.chef.nodes.SoftwareComponent:
         derived_from: cloudify.nodes.SoftwareComponent
         properties:
             # All Chef related configuration goes inside
@@ -193,8 +193,7 @@ node_types:
                     inputs: {}
 
     # A web server configured with chef
-    # see docs for cloudify.types.chef.middleware_server
-    cloudify.types.chef.web_server:
+    cloudify.chef.nodes.WebServer:
         derived_from: cloudify.nodes.WebServer
         interfaces:
             cloudify.interfaces.lifecycle:
@@ -217,8 +216,7 @@ node_types:
             chef_config: {}
 
     # An app server configured with chef
-    # see docs for cloudify.types.chef.middleware_server
-    cloudify.types.chef.app_server:
+    cloudify.chef.nodes.ApplicationServer:
         derived_from: cloudify.nodes.ApplicationServer
         interfaces:
             cloudify.interfaces.lifecycle:
@@ -241,8 +239,7 @@ node_types:
             chef_config: {}
 
     # A db server configured with chef
-    # see docs for cloudify.types.chef.middleware_server
-    cloudify.types.chef.db_server:
+    cloudify.chef.nodes.DBMS:
         derived_from: cloudify.nodes.DBMS
         interfaces:
             cloudify.interfaces.lifecycle:
@@ -264,33 +261,8 @@ node_types:
         properties:
             chef_config: {}
 
-    # A message bus server configured with chef
-    # see docs for cloudify.types.chef.middleware_server
-    cloudify.types.chef.message_bus_server:
-        derived_from: cloudify.nodes.MessageBusServer
-        interfaces:
-            cloudify.interfaces.lifecycle:
-                create:
-                    implementation: chef.chef_plugin.operations.operation
-                    inputs: {}
-                configure:
-                    implementation: chef.chef_plugin.operations.operation
-                    inputs: {}
-                start:
-                    implementation: chef.chef_plugin.operations.operation
-                    inputs: {}
-                stop:
-                    implementation: chef.chef_plugin.operations.operation
-                    inputs: {}
-                delete:
-                    implementation: chef.chef_plugin.operations.operation
-                    inputs: {}
-        properties:
-            chef_config: {}
-
     # An app module configured with chef
-    # see docs for cloudify.types.chef.middleware_server
-    cloudify.types.chef.app_module:
+    cloudify.chef.nodes.ApplicationModule:
         derived_from: cloudify.nodes.ApplicationModule
         interfaces:
             cloudify.interfaces.lifecycle:
