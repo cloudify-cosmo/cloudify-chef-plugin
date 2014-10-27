@@ -40,7 +40,7 @@ plugins:
 
 node_types:
     cloudify.types.chef.middleware_server:
-        derived_from: cloudify.types.middleware_server
+        derived_from: cloudify.nodes.SoftwareComponent
         properties:
             # All Chef related configuration goes inside
             # the "chef_config" property.
@@ -195,7 +195,7 @@ node_types:
     # A web server configured with chef
     # see docs for cloudify.types.chef.middleware_server
     cloudify.types.chef.web_server:
-        derived_from: cloudify.types.web_server
+        derived_from: cloudify.nodes.WebServer
         interfaces:
             cloudify.interfaces.lifecycle:
                 create:
@@ -219,7 +219,7 @@ node_types:
     # An app server configured with chef
     # see docs for cloudify.types.chef.middleware_server
     cloudify.types.chef.app_server:
-        derived_from: cloudify.types.app_server
+        derived_from: cloudify.nodes.ApplicationServer
         interfaces:
             cloudify.interfaces.lifecycle:
                 create:
@@ -243,7 +243,7 @@ node_types:
     # A db server configured with chef
     # see docs for cloudify.types.chef.middleware_server
     cloudify.types.chef.db_server:
-        derived_from: cloudify.types.db_server
+        derived_from: cloudify.nodes.DBMS
         interfaces:
             cloudify.interfaces.lifecycle:
                 create:
@@ -267,7 +267,7 @@ node_types:
     # A message bus server configured with chef
     # see docs for cloudify.types.chef.middleware_server
     cloudify.types.chef.message_bus_server:
-        derived_from: cloudify.types.message_bus_server
+        derived_from: cloudify.nodes.MessageBusServer
         interfaces:
             cloudify.interfaces.lifecycle:
                 create:
@@ -291,7 +291,7 @@ node_types:
     # An app module configured with chef
     # see docs for cloudify.types.chef.middleware_server
     cloudify.types.chef.app_module:
-        derived_from: cloudify.types.app_module
+        derived_from: cloudify.nodes.ApplicationModule
         interfaces:
             cloudify.interfaces.lifecycle:
                 create:
