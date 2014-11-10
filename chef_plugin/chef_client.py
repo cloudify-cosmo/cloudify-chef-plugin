@@ -134,8 +134,12 @@ class ChefManager(object):
     @classmethod
     def can_handle(cls, ctx):
         # All of the required args exist and are not None:
+        if ctx.type == context.NODE_INSTANCE:
+            properties = ctx.node.properties
+        else:
+            properties = ctx.source.node.properties
         return all([
-                   ctx.node.properties['chef_config'].get(arg) is not None
+                   properties['chef_config'].get(arg) is not None
                    for arg in cls.REQUIRED_ARGS
                    ])
 
