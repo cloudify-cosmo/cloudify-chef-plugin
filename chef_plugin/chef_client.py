@@ -144,6 +144,18 @@ class ChefManager(object):
         return ctx.source.node.properties
 
     @classmethod
+    def get_node(cls, ctx):
+        if ctx.type == context.NODE_INSTANCE:
+            return ctx.node
+        return ctx.source.node
+
+    @classmethod
+    def get_instance(cls, ctx):
+        if ctx.type == context.NODE_INSTANCE:
+            return ctx.instance
+        return ctx.source.instance
+
+    @classmethod
     def can_handle(cls, ctx):
         # All of the required args exist and are not None:
         properties = cls.get_node_properties(ctx)
@@ -176,12 +188,13 @@ class ChefManager(object):
         """ Get Chef root for this YAML node """
         # XXX: probably not fully cross-platform
         return os.path.join(os.sep, 'var', 'chef',
-                            'cloudify-node-' + self.ctx.node.id)
+                            'cloudify-node-' + self.get_node(self.ctx).id)
 
     def get_chef_node_name(self):
         """ Get Chef's node_name for this YAML node """
-        node_id = re.sub(r'[^a-zA-Z0-9-]', "-", str(self.ctx.node.id))
-        cc = self.ctx.node.properties['chef_config']
+        node_id = re.sub(
+            r'[^a-zA-Z0-9-]', "-", str(self.get_node(self.ctx.id)))
+        cc = self.get_node_properties(self.ctx)['chef_config']
         return cc['node_name_prefix'] + node_id + cc['node_name_suffix']
 
     def get_path(self, *p):
@@ -226,7 +239,7 @@ class ChefManager(object):
                 raise ChefError("Chef install failed on:\n%s" % exc)
 
             ctx.logger.info('Setting up Chef [chef_server=\n%s]',
-                            ctx.node.properties['chef_config']
+                            self.get_node_properties(ctx)['chef_config']
                             .get('chef_server_url'))
 
     def install_files(self):
@@ -298,7 +311,7 @@ class ChefManager(object):
         self._prepare_for_run(runlist)
 
         t = 'cloudify_chef_attrs_in.{0}.{1}.{2}.'.format(
-            ctx.node.name, ctx.instance.id, os.getpid())
+            self.get_node(ctx).name, self.get_instance(ctx).id, os.getpid())
         self.attribute_file = tempfile.NamedTemporaryFile(prefix=t,
                                                           suffix=".json",
                                                           delete=False)
