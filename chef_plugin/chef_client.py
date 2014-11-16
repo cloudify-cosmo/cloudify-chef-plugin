@@ -132,12 +132,15 @@ class ChefManager(object):
         self.ctx = ctx
 
     @classmethod
+    def get_node_properties(ctx):
+        if ctx.type == context.NODE_INSTANCE:
+            return ctx.node.properties
+        return ctx.source.node.properties
+
+    @classmethod
     def can_handle(cls, ctx):
         # All of the required args exist and are not None:
-        if ctx.type == context.NODE_INSTANCE:
-            properties = ctx.node.properties
-        else:
-            properties = ctx.source.node.properties
+        properties = cls.get_node_properties(ctx)
         return all([
                    properties['chef_config'].get(arg) is not None
                    for arg in cls.REQUIRED_ARGS
@@ -145,8 +148,9 @@ class ChefManager(object):
 
     @classmethod
     def assert_args(cls, ctx):
+        properties = cls.get_node_properties(ctx)
         missing_fields = (cls.REQUIRED_ARGS).union(
-            {'version'}).difference(ctx.node.properties['chef_config'].keys())
+            {'version'}).difference(properties['chef_config'].keys())
         if missing_fields:
             raise ChefError(
                 "The following required field(s) "
