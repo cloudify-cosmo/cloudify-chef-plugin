@@ -132,7 +132,7 @@ class ChefManager(object):
         self.ctx = ctx
 
     @classmethod
-    def get_node_properties(ctx):
+    def get_node_properties(cls, ctx):
         if ctx.type == context.NODE_INSTANCE:
             return ctx.node.properties
         return ctx.source.node.properties
