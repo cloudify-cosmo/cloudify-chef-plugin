@@ -89,6 +89,12 @@ class RetryingLock(object):
     def __enter__(self):
         self.ctx.logger.info("Using lock file {0}".format(self.path))
         self.file = open(self.path, 'w+')
+        if self.ctx.type == context.NODE_INSTANCE:
+            node = self.ctx.node
+            instance = self.ctx.instance
+        else:
+            node = self.ctx.source.node
+            instance = self.ctx.source.instance
         for i in range(0, self.retries):
             try:
                 flock(self.file, LOCK_EX | LOCK_NB)
@@ -108,8 +114,8 @@ class RetryingLock(object):
                                 "node_id {3}\n".format(
                                     os.getpid(),
                                     self.ctx.deployment.id,
-                                    self.ctx.node.name,
-                                    self.ctx.instance.id))
+                                    node.name,
+                                    instance.id))
                 self.file.flush()
                 return
         raise RuntimeError("Failed to lock the file '{0}'.".format(self.path))
