@@ -185,7 +185,8 @@ class ChefManager(object):
     def install(self):
         """If needed, install chef-client and point it to the server"""
         ctx = self.ctx
-        chef_version = ctx.node.properties['chef_config']['version']
+        properties = self.get_node_properties(ctx)
+        chef_version = properties['chef_config']['version']
 
         with RetryingLock(ctx, *CHEF_INSTALL_LOCK):
 
