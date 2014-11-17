@@ -589,6 +589,10 @@ class ChefSoloManager(ChefManager):
         # missing)
         super(ChefSoloManager, self).install_files()
         ctx = self.ctx
+        if ctx.type == context.NODE_INSTANCE:
+            properties = ctx.node.properties
+        else:
+            properties = ctx.source.node.properties
         self._sudo_write_file(
             self.get_path('etc', 'solo.rb'),
             self.get_chef_common_config() +
@@ -596,7 +600,7 @@ class ChefSoloManager(ChefManager):
             'pid_file               "{chef_data_root}/solo.pid"\n'
             'Chef::Log::Formatter.show_time = true\n'.format(
                 chef_data_root=self.get_chef_data_root(),
-                **ctx.node.properties['chef_config']))
+                **properties['chef_config']))
 
 
 def get_manager(ctx):
