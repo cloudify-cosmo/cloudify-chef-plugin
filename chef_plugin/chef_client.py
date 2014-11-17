@@ -416,8 +416,9 @@ class ChefClientManager(ChefManager):
     def __init__(self, *args,  **kwargs):
         super(ChefClientManager, self).__init__(*args, **kwargs)
         ctx = self.ctx
+        properties = self.get_node_properties(ctx)
         for k in 'node_name_prefix', 'node_name_suffix':
-            if k not in ctx.node.properties['chef_config']:
+            if k not in properties['chef_config']:
                 raise RuntimeError("Missing chef_config.{0} parameter".format(
                                    k))
 
@@ -438,11 +439,11 @@ class ChefClientManager(ChefManager):
         super(ChefClientManager, self).install_files()
         ctx = self.ctx
         chef_data_root = self.get_chef_data_root()
-
-        if ctx.node.properties['chef_config'].get('validation_key'):
+        properties = self.get_node(ctx)
+        if properties['chef_config'].get('validation_key'):
             self._sudo_write_file(
                 self.get_path('etc', 'validation.pem'),
-                ctx.node.properties['chef_config']['validation_key'])
+                properties['chef_config']['validation_key'])
 
         node_name = self.get_chef_node_name()
 
@@ -461,7 +462,7 @@ class ChefClientManager(ChefManager):
             'Chef::Log::Formatter.show_time = true\n'.format(
                 node_name=node_name,
                 chef_data_root=chef_data_root,
-                **ctx.node.properties['chef_config']))
+                **properties['chef_config']))
 
 
 def is_resource_url(url):
@@ -484,6 +485,11 @@ class ChefSoloManager(ChefManager):
         'sandbox_path': 'sandbox'
     }
     DIRS.update(COMMON_DIRS)
+
+    def _get_node_properties(self, ctx):
+        if ctx.type == context.NODE_INSTANCE:
+            return ctx.node.properties
+        return ctx.source.node.properties
 
     def _url_to_dir(self, url, dst_dir):
         """
@@ -541,7 +547,8 @@ class ChefSoloManager(ChefManager):
 
     def _prepare_for_run(self, runlist):
         ctx = self.ctx
-        cc = ctx.node.properties['chef_config']
+        properties = self._get_node_properties(ctx)
+        cc = properties['chef_config']
         file_name = self.get_path(SOLO_COOKBOOKS_FILE)
         for dl in 'environments', 'data_bags', 'roles':
             self._url_to_dir(cc.get(dl), self.get_path(dl))
@@ -562,15 +569,15 @@ class ChefSoloManager(ChefManager):
         ctx = self.ctx
         cookbooks_file_path = self.get_path(SOLO_COOKBOOKS_FILE)
         cmd = ["chef-solo"]
-
-        if (ctx.node.properties['chef_config'].get('environment', '_default')
+        properties = self._get_node_properties(ctx)
+        if (properties['chef_config'].get('environment', '_default')
                 != '_default'):
             v = self.get_version()
             if map(int, v.split('.')) < ENVS_MIN_VER:
                 raise ChefError("Chef solo environments are supported "
                                 "starting at {0} but you are using {1}".
                                 format(ENVS_MIN_VER_STR, v))
-            cmd += ["-E", ctx.node.properties['chef_config']['environment']]
+            cmd += ["-E", properties['chef_config']['environment']]
         cmd += [
             "-c", self.get_path('etc', 'solo.rb'),
             "-o", runlist,
@@ -589,10 +596,7 @@ class ChefSoloManager(ChefManager):
         # missing)
         super(ChefSoloManager, self).install_files()
         ctx = self.ctx
-        if ctx.type == context.NODE_INSTANCE:
-            properties = ctx.node.properties
-        else:
-            properties = ctx.source.node.properties
+        properties = self._get_node_properties(ctx)
         self._sudo_write_file(
             self.get_path('etc', 'solo.rb'),
             self.get_chef_common_config() +
