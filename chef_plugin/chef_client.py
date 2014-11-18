@@ -192,8 +192,9 @@ class ChefManager(object):
 
     def get_chef_node_name(self):
         """ Get Chef's node_name for this YAML node """
+        instance = self.get_instance(self.ctx)
         node_id = re.sub(
-            r'[^a-zA-Z0-9-]', "-", str(self.get_node(self.ctx.id)))
+            r'[^a-zA-Z0-9-]', "-", str(instance.id))
         cc = self.get_node_properties(self.ctx)['chef_config']
         return cc['node_name_prefix'] + node_id + cc['node_name_suffix']
 
