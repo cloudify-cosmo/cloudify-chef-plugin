@@ -439,7 +439,7 @@ class ChefClientManager(ChefManager):
         super(ChefClientManager, self).install_files()
         ctx = self.ctx
         chef_data_root = self.get_chef_data_root()
-        properties = self.get_node(ctx)
+        properties = self.get_node_properties(ctx)
         if properties['chef_config'].get('validation_key'):
             self._sudo_write_file(
                 self.get_path('etc', 'validation.pem'),
