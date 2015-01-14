@@ -22,14 +22,14 @@ import setuptools
 setuptools.setup(
     zip_safe=False,
     name='cloudify-chef-plugin',
-    version='1.2a2',
+    version='1.2a3',
     author='ilya',
     author_email='ilya.sher@coding-knight.com',
     packages=['chef_plugin'],
     license='LICENSE',
     description='Cloudify Chef plugin',
     install_requires=[
-        'cloudify-plugins-common==3.2a2',
+        'cloudify-plugins-common==3.2a3',
         'requests',
     ],
     package_data={
