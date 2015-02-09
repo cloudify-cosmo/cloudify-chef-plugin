@@ -14,8 +14,6 @@
 #    * limitations under the License.
 
 
-__author__ = 'dank'
-
 import setuptools
 
 
@@ -29,7 +27,7 @@ setuptools.setup(
     license='LICENSE',
     description='Cloudify Chef plugin',
     install_requires=[
-        'cloudify-plugins-common==3.2a4',
+        'cloudify-plugins-common>=3.2a4',
         'requests',
     ],
     package_data={
