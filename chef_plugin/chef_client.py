@@ -571,8 +571,8 @@ class ChefSoloManager(ChefManager):
         cookbooks_file_path = self.get_path(SOLO_COOKBOOKS_FILE)
         cmd = ["chef-solo"]
         properties = self._get_node_properties(ctx)
-        if (properties['chef_config'].get('environment', '_default')
-                != '_default'):
+        if (properties['chef_config'].get('environment', '_default') !=
+                '_default'):
             v = self.get_version()
             if map(int, v.split('.')) < ENVS_MIN_VER:
                 raise ChefError("Chef solo environments are supported "
