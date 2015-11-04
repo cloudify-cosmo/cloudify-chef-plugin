@@ -37,6 +37,8 @@ plugins:
     chef:
         executor: host_agent
         source: https://github.com/cloudify-cosmo/cloudify-chef-plugin/archive/1.3rc1.zip
+        package_name: cloudify-chef-plugin
+        package_version: 1.3rc1
 
 node_types:
     cloudify.chef.nodes.SoftwareComponent:
